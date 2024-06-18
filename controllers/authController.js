@@ -1,6 +1,5 @@
 // authController.js
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const University = require('../model/universitySchema');
 const Student = require('../model/studentSchema');
 const { generateToken } = require('../middleware/middlewares');
@@ -9,10 +8,13 @@ const registerUniversity = async (req, res) => {
     const { username, email, password, name, about, history, mission, values, logo, coverPhoto, courses, placementStats, contactDetails } = req.body;
 
     try {
-        const existingUniversity = await University.findOne({ $or: [{ username }, { email }] });
-        if (existingUniversity) {
-            return res.status(400).json({ message: 'Username or email already exists' });
+        const existingUniversity = await University.findOne({ username });
+        const existingStudent = await Student.findOne({ username });
+
+        if (existingUniversity || existingStudent) {
+            return res.status(400).json({ message: 'Username already exists' });
         }
+
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUniversity = new University({
             username,
@@ -41,10 +43,13 @@ const registerStudent = async (req, res) => {
     const { username, email, password, profile, status } = req.body;
 
     try {
-        const existingStudent = await Student.findOne({ $or: [{ username }, { email }] });
-        if (existingStudent) {
-            return res.status(400).json({ message: 'Username or email already exists' });
+        const existingUniversity = await University.findOne({ username });
+        const existingStudent = await Student.findOne({ username });
+
+        if (existingUniversity || existingStudent) {
+            return res.status(400).json({ message: 'Username already exists' });
         }
+
         const hashedPassword = await bcrypt.hash(password, 10);
         const newStudent = new Student({
             username,
