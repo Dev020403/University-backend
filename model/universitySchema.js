@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const universitySchema = new Schema({
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
     name: { type: String, required: true },
     about: String,
     history: String,
@@ -19,7 +22,6 @@ const universitySchema = new Schema({
     contactDetails: {
         address: String,
         phone: String,
-        email: String,
         website: String,
     },
 }, { timestamps: true });

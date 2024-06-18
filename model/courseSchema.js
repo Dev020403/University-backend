@@ -10,7 +10,7 @@ const courseSchema = new Schema({
     facilities: [String],
     resources: [String],
     studentFeedback: [{
-        student: { type: Schema.Types.ObjectId, ref: 'User' },
+        student: { type: Schema.Types.ObjectId, ref: 'Student' },
         review: String,
         rating: Number,
         date: { type: Date, default: Date.now }

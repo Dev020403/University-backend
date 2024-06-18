@@ -1,38 +1,35 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 
-const generateToken = (user) => {
-    const payload = {
-        userId: user._id,
-        email: user.email,
-        role: user.role,
-    };
-    const options = {
-        expiresIn: "24h",
-    };
-    const token = jwt.sign(payload, '12345', options);
-    return token;
+const generateToken = (userId, username) => {
+    return jwt.sign(
+        { userId, username },
+        'your_secret_key_here',
+        { expiresIn: '1h' }
+    );
 };
+const verifyToken = async (req, res, next) => {
+    const token = req.headers.authorization;
 
-const verifyToken = (req, res, next) => {
-    const { authorization } = req.headers;
-    const token = authorization.split(" ")[1];
-    console.log(token)
     if (!token) {
-        return res.status(403).json({ success: false, message: "Token is required" });
+        return res.status(401).json({ message: 'Unauthorized: No token provided' });
     }
-    jwt.verify(token, '12345', (err, decoded) => {
-        if (err) {
-            return res.status(401).json({ success: false, message: "Invalid token" });
+
+    try {
+        const decoded = jwt.verify(token, 'your_secret_key_here');
+
+        if (decoded) {
+            req.user = decoded;
+            next();
+        } else {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
         }
-        req.user = decoded;
-        next();
-    });
+    } catch (error) {
+        console.error('Error verifying token:', error);
+        return res.status(500).json({ message: 'Failed to authenticate token' });
+    }
 };
 
-const verifyRole = (roles) => (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-        return res.status(403).json({ success: false, message: "Access denied." });
-    }
-    next();
+module.exports = {
+    generateToken,
+    verifyToken
 };
-module.exports = { generateToken, verifyToken, verifyRole };
