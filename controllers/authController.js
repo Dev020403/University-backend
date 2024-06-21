@@ -72,10 +72,11 @@ const login = async (req, res) => {
 
     try {
         let user = await University.findOne({ username });
+        let role = 'university';
         if (!user) {
             user = await Student.findOne({ username });
+            role = 'student';
         }
-
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -85,9 +86,9 @@ const login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid password' });
         }
 
-        const token = generateToken(user._id, user.username)
+        const token = generateToken(user._id, user.username);
 
-        res.status(200).json({ token });
+        res.status(200).json({ token, role, user });
     } catch (error) {
         console.error('Error logging in:', error);
         res.status(500).json({ message: 'Failed to log in' });
