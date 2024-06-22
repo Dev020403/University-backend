@@ -8,8 +8,9 @@ const generateToken = (userId, username) => {
     );
 };
 const verifyToken = async (req, res, next) => {
-    const token = req.headers.authorization;
-
+    const bearerToken = req.headers.authorization;
+    token = bearerToken.split(' ')[1];
+    console.log(token)
     if (!token) {
         return res.status(401).json({ message: 'Unauthorized: No token provided' });
     }
