@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const verifyToken = require('../middleware/verifyToken');
+const {verifyToken} = require('../middleware/middlewares');
 const applicationController = require('../controllers/applicationController');
 
 // Route to create a new application

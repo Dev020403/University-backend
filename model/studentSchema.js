@@ -18,6 +18,11 @@ const studentSchema = new Schema({
         },
         preferences: [String],
     },
+    notifications: [{
+        message: String,
+        date: { type: Date, default: Date.now },
+        isRead: { type: Boolean, default: false }
+    }],
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
 }, { timestamps: true });
 

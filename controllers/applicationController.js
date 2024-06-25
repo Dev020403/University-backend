@@ -1,7 +1,8 @@
 const Application = require('../model/applicationSchema');
-const Student = require('../model/studentSchema'); // Ensure this model exists
+const Student = require('../model/studentSchema');
 const University = require('../model/universitySchema');
 const Course = require('../model/courseSchema');
+const sendMail = require('../utils/mailer');
 
 // Controller for creating a new application
 const createApplication = async (req, res) => {
@@ -37,6 +38,18 @@ const createApplication = async (req, res) => {
         // Save the application
         const savedApplication = await newApplication.save();
 
+        // Send email notification
+        const message = `You have successfully submitted your application for the course ${course.name} at ${university.name}.`;
+        await sendMail(student.email, 'Application Submitted', message);
+
+        // Save notification in student's record
+        student.notifications.push({
+            message,
+            date: new Date(),
+            isRead: false
+        });
+        await student.save();
+
         res.status(201).json(savedApplication);
     } catch (error) {
         console.error('Error creating application:', error);
@@ -60,6 +73,19 @@ const updateApplicationStatus = async (req, res) => {
         application.applicationStatus = status;
         application.decisionDate = status === 'accepted' || status === 'rejected' ? Date.now() : null;
         const updatedApplication = await application.save();
+
+        // Send email notification
+        const student = await Student.findById(application.student);
+        const message = `Your application status for the course ${application.course} at ${application.university} has been updated to: ${status}.`;
+        await sendMail(student.email, 'Application Status Update', message);
+
+        // Save notification in student's record
+        student.notifications.push({
+            message,
+            date: new Date(),
+            isRead: false
+        });
+        await student.save();
 
         res.status(200).json(updatedApplication);
     } catch (error) {
