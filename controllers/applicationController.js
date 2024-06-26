@@ -98,7 +98,7 @@ const getStudentApplications = async (req, res) => {
         const { studentId } = req.params;
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
-        const search = req.query.search || ''; 
+        const search = req.query.search || '';
         const skip = (page - 1) * limit;
 
         const searchCondition = search
@@ -131,15 +131,26 @@ const getUniversityApplications = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const search = req.query.search || '';
+        const sortBy = req.query.sortBy || '';
+
         const skip = (page - 1) * limit;
 
         const searchCondition = search
-            ? { university: universityId, 'student.name': { $regex: search, $options: 'i' } }
+            ? { university: universityId, 'student.profile.name': { $regex: search, $options: 'i' } }
             : { university: universityId };
+
+        let sortOptions = { createdAt: -1 };
+
+        if (sortBy === 'jeePr') {
+            sortOptions = { 'student.profile.academicBackground.jeePr': -1 };
+        } else if (sortBy === 'boardPr') {
+            sortOptions = { 'student.profile.academicBackground.boardPr': -1 };
+        }
 
         const applications = await Application.find(searchCondition)
             .populate('student')
             .populate('course')
+            .sort(sortOptions)
             .skip(skip)
             .limit(limit);
 
@@ -153,9 +164,10 @@ const getUniversityApplications = async (req, res) => {
             total
         });
     } catch (error) {
-        res.status500.json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
 
 
 module.exports = {
