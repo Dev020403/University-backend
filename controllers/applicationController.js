@@ -98,12 +98,11 @@ const getStudentApplications = async (req, res) => {
         const { studentId } = req.params;
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
-        const search = req.query.search || ''; // Get search query
+        const search = req.query.search || ''; 
         const skip = (page - 1) * limit;
 
-        // Create a search condition
         const searchCondition = search
-            ? { student: studentId, 'university.name': { $regex: search, $options: 'i' } } // Adjust the field to search as necessary
+            ? { student: studentId, 'university.name': { $regex: search, $options: 'i' } }
             : { student: studentId };
 
         const applications = await Application.find(searchCondition)
