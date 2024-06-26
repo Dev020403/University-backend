@@ -93,8 +93,33 @@ const updateApplicationStatus = async (req, res) => {
         res.status(500).json({ message: 'Server error', error });
     }
 };
+const getStudentApplications = async (req, res) => {
+    try {
+        const { studentId } = req.params;
+        const applications = await Application.find({ student: studentId })
+            .populate('university')
+            .populate('course');
+        res.status(200).json(applications);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+const getUniversityApplications = async (req, res) => {
+    try {
+        const universityId = req.params.universityId;
+        const applications = await Application.find({ university: universityId })
+            .populate('student')
+            .populate('course');
+        res.status(200).json(applications);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
 
 module.exports = {
     createApplication,
     updateApplicationStatus,
+    getStudentApplications,
+    getUniversityApplications
 };
