@@ -5,8 +5,24 @@ const University = require('../model/universitySchema');
 // Controller to get all universities
 const getAllUniversity = async (req, res) => {
     try {
-        const universities = await University.find().populate('courses');
-        res.status(200).json(universities);
+        const page = parseInt(req.query.page) || 1; 
+        const limit = parseInt(req.query.limit) || 10; 
+        const skip = (page - 1) * limit;
+
+        const universities = await University.find()
+            .populate('courses')
+            .skip(skip)
+            .limit(limit);
+
+        const total = await University.countDocuments();
+        const totalPages = Math.ceil(total / limit);
+
+        res.status(200).json({
+            universities,
+            page,
+            totalPages,
+            total
+        });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

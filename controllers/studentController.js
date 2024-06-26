@@ -3,12 +3,28 @@ const Student = require('../model/studentSchema');
 // Get all students
 exports.getAllStudents = async (req, res) => {
     try {
-        const students = await Student.find();
-        res.status(200).json(students);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const students = await Student.find()
+            .skip(skip)
+            .limit(limit);
+
+        const total = await Student.countDocuments();
+        const totalPages = Math.ceil(total / limit);
+
+        res.status(200).json({
+            students,
+            page,
+            totalPages,
+            total
+        });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching students', error });
     }
 };
+
 
 // Get student by ID
 exports.getStudentById = async (req, res) => {

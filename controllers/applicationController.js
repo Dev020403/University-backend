@@ -96,22 +96,51 @@ const updateApplicationStatus = async (req, res) => {
 const getStudentApplications = async (req, res) => {
     try {
         const { studentId } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
         const applications = await Application.find({ student: studentId })
             .populate('university')
-            .populate('course');
-        res.status(200).json(applications);
+            .populate('course')
+            .skip(skip)
+            .limit(limit);
+
+        const total = await Application.countDocuments({ student: studentId });
+        const totalPages = Math.ceil(total / limit);
+
+        res.status(200).json({
+            applications,
+            page,
+            totalPages,
+            total
+        });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-
 const getUniversityApplications = async (req, res) => {
     try {
-        const universityId = req.params.universityId;
+        const { universityId } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
         const applications = await Application.find({ university: universityId })
             .populate('student')
-            .populate('course');
-        res.status(200).json(applications);
+            .populate('course')
+            .skip(skip)
+            .limit(limit);
+
+        const total = await Application.countDocuments({ university: universityId });
+        const totalPages = Math.ceil(total / limit);
+
+        res.status(200).json({
+            applications,
+            page,
+            totalPages,
+            total
+        });
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
