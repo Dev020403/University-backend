@@ -5,13 +5,19 @@ exports.getAllStudents = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
+        const search = req.query.search || ''; 
         const skip = (page - 1) * limit;
 
-        const students = await Student.find()
+        // Create a search condition
+        const searchCondition = search
+            ? { name: { $regex: search, $options: 'i' } } 
+            : {};
+
+        const students = await Student.find(searchCondition)
             .skip(skip)
             .limit(limit);
 
-        const total = await Student.countDocuments();
+        const total = await Student.countDocuments(searchCondition);
         const totalPages = Math.ceil(total / limit);
 
         res.status(200).json({
@@ -24,6 +30,7 @@ exports.getAllStudents = async (req, res) => {
         res.status(500).json({ message: 'Error fetching students', error });
     }
 };
+
 
 
 // Get student by ID

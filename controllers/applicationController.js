@@ -98,15 +98,21 @@ const getStudentApplications = async (req, res) => {
         const { studentId } = req.params;
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
+        const search = req.query.search || ''; // Get search query
         const skip = (page - 1) * limit;
 
-        const applications = await Application.find({ student: studentId })
+        // Create a search condition
+        const searchCondition = search
+            ? { student: studentId, 'university.name': { $regex: search, $options: 'i' } } // Adjust the field to search as necessary
+            : { student: studentId };
+
+        const applications = await Application.find(searchCondition)
             .populate('university')
             .populate('course')
             .skip(skip)
             .limit(limit);
 
-        const total = await Application.countDocuments({ student: studentId });
+        const total = await Application.countDocuments(searchCondition);
         const totalPages = Math.ceil(total / limit);
 
         res.status(200).json({
@@ -119,20 +125,26 @@ const getStudentApplications = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
 const getUniversityApplications = async (req, res) => {
     try {
         const { universityId } = req.params;
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
+        const search = req.query.search || '';
         const skip = (page - 1) * limit;
 
-        const applications = await Application.find({ university: universityId })
+        const searchCondition = search
+            ? { university: universityId, 'student.name': { $regex: search, $options: 'i' } }
+            : { university: universityId };
+
+        const applications = await Application.find(searchCondition)
             .populate('student')
             .populate('course')
             .skip(skip)
             .limit(limit);
 
-        const total = await Application.countDocuments({ university: universityId });
+        const total = await Application.countDocuments(searchCondition);
         const totalPages = Math.ceil(total / limit);
 
         res.status(200).json({
@@ -142,9 +154,10 @@ const getUniversityApplications = async (req, res) => {
             total
         });
     } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status500.json({ error: 'Internal Server Error' });
     }
 };
+
 
 module.exports = {
     createApplication,

@@ -5,16 +5,21 @@ const University = require('../model/universitySchema');
 // Controller to get all universities
 const getAllUniversity = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1; 
-        const limit = parseInt(req.query.limit) || 10; 
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const search = req.query.search || ''; 
         const skip = (page - 1) * limit;
 
-        const universities = await University.find()
+        const searchCondition = search
+            ? { name: { $regex: search, $options: 'i' } } 
+            : {};
+
+        const universities = await University.find(searchCondition)
             .populate('courses')
             .skip(skip)
             .limit(limit);
 
-        const total = await University.countDocuments();
+        const total = await University.countDocuments(searchCondition);
         const totalPages = Math.ceil(total / limit);
 
         res.status(200).json({
@@ -27,6 +32,7 @@ const getAllUniversity = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
 
 // Controller to get a university by ID
 const getUniversityById = async (req, res) => {
