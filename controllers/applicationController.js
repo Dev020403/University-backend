@@ -59,11 +59,10 @@ const createApplication = async (req, res) => {
 // Controller for updating the application status
 const updateApplicationStatus = async (req, res) => {
     try {
-        const { applicationId } = req.params;
+        const { id } = req.params;
         const { status } = req.body;
-
         // Check if the application exists
-        const application = await Application.findById(applicationId);
+        const application = await Application.findById(id);
         if (!application) {
             return res.status(404).json({ message: 'Application not found' });
         }
@@ -108,7 +107,8 @@ const getStudentApplications = async (req, res) => {
             .populate('university')
             .populate('course')
             .skip(skip)
-            .limit(limit);
+            .limit(limit)
+            .sort({ createdAt: -1 });
 
         const total = await Application.countDocuments(searchCondition);
         const totalPages = Math.ceil(total / limit);

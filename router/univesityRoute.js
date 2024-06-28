@@ -11,6 +11,6 @@ router.get('/universities', verifyToken, universityController.getAllUniversity);
 router.get('/universities/:id', verifyToken, universityController.getUniversityById);
 
 // PUT update a university by ID
-router.put('/update-university/:_id', verifyToken, universityController.updateUniversity);
+router.put('/update-university/:id', universityController.updateUniversityDetails);
 
 module.exports = router;
