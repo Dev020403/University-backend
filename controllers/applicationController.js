@@ -7,7 +7,7 @@ const sendMail = require('../utils/mailer');
 // Controller for creating a new application
 const createApplication = async (req, res) => {
     try {
-        const { studentId, universityId, courseId, documents } = req.body;
+        const { studentId, universityId, courseId } = req.body;
 
         // Check if the student exists
         const student = await Student.findById(studentId);
@@ -32,7 +32,6 @@ const createApplication = async (req, res) => {
             student: studentId,
             university: universityId,
             course: courseId,
-            documents,
         });
 
         // Save the application
