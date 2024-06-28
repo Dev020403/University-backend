@@ -6,4 +6,6 @@ const courseController = require('../controllers/courseController');
 
 router.post('/create-course', verifyToken, courseController.createCourse);
 
+router.get('/course/:id', courseController.getCourseById);
+
 module.exports = router;
