@@ -167,11 +167,40 @@ const getUniversityApplications = async (req, res) => {
     }
 };
 
+const getTotalUniversityData = async (req, res) => {
+    try {
+        const { universityId } = req.params;
+
+        // Get total courses for university
+        const totalCourses = await Course.countDocuments({ university: universityId });
+
+        // Get total applications for university
+        const totalApplications = await Application.countDocuments({ university: universityId });
+
+        // Get total application statuses
+        const acceptedCount = await Application.countDocuments({ university: universityId, applicationStatus: 'accepted' });
+        const rejectedCount = await Application.countDocuments({ university: universityId, applicationStatus: 'rejected' });
+        const submittedCount = await Application.countDocuments({ university: universityId, applicationStatus: 'submitted' });
+        const underReviewCount = await Application.countDocuments({ university: universityId, applicationStatus: 'underReview' });
+
+        res.status(200).json({
+            totalCourses,
+            totalApplications,
+            acceptedCount,
+            rejectedCount,
+            submittedCount,
+            underReviewCount
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
 
 
 module.exports = {
     createApplication,
     updateApplicationStatus,
     getStudentApplications,
-    getUniversityApplications
+    getUniversityApplications,
+    getTotalUniversityData
 };
