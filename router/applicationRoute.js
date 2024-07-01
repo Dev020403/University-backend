@@ -7,7 +7,7 @@ const applicationController = require('../controllers/applicationController');
 router.post('/create-application', verifyToken, applicationController.createApplication);
 
 // Route to update the application status
-router.put('/:applicationId/status', applicationController.updateApplicationStatus);
+router.put('/:applicationId/status', verifyToken,applicationController.updateApplicationStatus);
 
 // Route to get student's applications
 router.get('/student-applications/:studentId',verifyToken, applicationController.getStudentApplications);

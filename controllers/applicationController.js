@@ -59,10 +59,10 @@ const createApplication = async (req, res) => {
 // Controller for updating the application status
 const updateApplicationStatus = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { applicationId } = req.params;
         const { status } = req.body;
         // Check if the application exists
-        const application = await Application.findById(id);
+        const application = await Application.findById(applicationId);
         if (!application) {
             return res.status(404).json({ message: 'Application not found' });
         }
