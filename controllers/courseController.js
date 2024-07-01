@@ -36,7 +36,7 @@ const createCourse = async (req, res) => {
         res.status(500).json({ message: 'Server error', error });
     }
 };
-const getCourseById = async (req,res) => {
+const getCourseById = async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -51,6 +51,21 @@ const getCourseById = async (req,res) => {
         res.status(500).json({ message: err.message });
     }
 }
+
+const getCoursesByUniversity = async (req, res) => {
+    const { universityId } = req.params;
+
+    try {
+        const courses = await Course.find({ university: universityId })
+        if (!courses) {
+            return res.status(404).json({ message: 'No courses found for this university' });
+        }
+        res.status(200).json(courses);
+    } catch (error) {
+        console.error('Error fetching courses:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
 module.exports = {
-    createCourse, getCourseById
+    createCourse, getCourseById, getCoursesByUniversity
 };
