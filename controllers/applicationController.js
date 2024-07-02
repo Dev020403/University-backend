@@ -27,6 +27,17 @@ const createApplication = async (req, res) => {
             return res.status(404).json({ message: 'Course not found' });
         }
 
+        // Check if the student has already applied for this course at this university
+        const existingApplication = await Application.findOne({
+            student: studentId,
+            university: universityId,
+            course: courseId,
+        });
+
+        if (existingApplication) {
+            return res.json({ code: 400, message: 'You have aleardy applied for the course' });
+        }
+
         // Create a new application
         const newApplication = new Application({
             student: studentId,
@@ -45,7 +56,7 @@ const createApplication = async (req, res) => {
         student.notifications.push({
             message,
             date: new Date(),
-            isRead: false
+            isRead: false,
         });
         await student.save();
 
