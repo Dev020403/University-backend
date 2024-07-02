@@ -3,6 +3,7 @@ const Student = require('../model/studentSchema');
 const University = require('../model/universitySchema');
 const Course = require('../model/courseSchema');
 const sendMail = require('../utils/mailer');
+const mongoose = require('mongoose');
 
 // Controller for creating a new application
 const createApplication = async (req, res) => {
@@ -140,8 +141,27 @@ const getUniversityApplications = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const sortBy = req.query.sortBy || '';
+        const searchQuery = req.query.search || '';
 
         const skip = (page - 1) * limit;
+
+        let searchCriteria = {};
+        if (searchQuery) {
+            let objectId;
+            try {
+                objectId = new mongoose.Types.ObjectId(searchQuery);
+            } catch (error) {
+                objectId = null;
+            }
+
+            searchCriteria = {
+                $or: [
+                    { "student.profile.name": { $regex: searchQuery, $options: 'i' } },
+                    { "student.email": { $regex: searchQuery, $options: 'i' } },
+                    { _id: objectId }
+                ]
+            };
+        }
 
         let sortField;
         if (sortBy === 'jeePr') {
@@ -151,6 +171,8 @@ const getUniversityApplications = async (req, res) => {
         } else {
             sortField = 'createdAt';
         }
+
+        const Application = mongoose.model('Application');
 
         const applications = await Application.aggregate([
             {
@@ -180,6 +202,9 @@ const getUniversityApplications = async (req, res) => {
                 }
             },
             {
+                $match: searchCriteria
+            },
+            {
                 $sort: { [sortField]: -1 }
             },
             {
@@ -190,7 +215,7 @@ const getUniversityApplications = async (req, res) => {
             }
         ]);
 
-        const total = await Application.countDocuments() - 1;
+        const total = await Application.countDocuments(searchCriteria);
         const totalPages = Math.ceil(total / limit);
 
         res.status(200).json({
@@ -204,7 +229,6 @@ const getUniversityApplications = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-
 
 const getTotalUniversityData = async (req, res) => {
     try {
