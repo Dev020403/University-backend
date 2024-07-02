@@ -1,5 +1,6 @@
 const Course = require('../model/courseSchema');
 const University = require('../model/universitySchema');
+const Application = require('../model/applicationSchema');
 
 // Controller for creating a course
 const createCourse = async (req, res) => {
@@ -86,15 +87,21 @@ const deleteCourse = async (req, res) => {
             { new: true }
         );
 
+        // Delete all applications related to the course
+        await Application.deleteMany({ course: id });
+
         // Delete the course
         await Course.findByIdAndDelete(id);
 
-        res.status(200).json({ message: 'Course deleted successfully' });
+        res.status(200).json({ message: 'Course and related applications deleted successfully' });
     } catch (error) {
         console.error('Error deleting course:', error);
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+module.exports = deleteCourse;
+
 
 
 const updateCourse = async (req, res) => {

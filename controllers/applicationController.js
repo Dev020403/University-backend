@@ -137,7 +137,6 @@ const getStudentApplications = async (req, res) => {
 
 const getUniversityApplications = async (req, res) => {
     try {
-        const { universityId } = req.params;
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const sortBy = req.query.sortBy || '';
@@ -156,14 +155,6 @@ const getUniversityApplications = async (req, res) => {
         const applications = await Application.aggregate([
             {
                 $lookup:
-                /**
-                 * from: The target collection.
-                 * localField: The local join field.
-                 * foreignField: The target join field.
-                 * as: The name for the results.
-                 * pipeline: Optional pipeline to run on the foreign collection.
-                 * let: Optional variables to use in the pipeline field stages.
-                 */
                 {
                     from: "students",
                     localField: "student",
@@ -173,21 +164,11 @@ const getUniversityApplications = async (req, res) => {
             },
             {
                 $unwind:
-                /**
-                 * path: Path to the array field.
-                 * includeArrayIndex: Optional name for index.
-                 * preserveNullAndEmptyArrays: Optional
-                 *   toggle to unwind null and empty values.
-                 */
                 {
                     path: "$student"
                 }
             },
             {
-
-                /**
-                 * Provide any number of field/order pairs.
-                 */
                 $sort: { [sortField]: -1 }
             }
         ]).skip(skip).limit(limit);
