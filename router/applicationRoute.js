@@ -13,7 +13,7 @@ router.put('/:applicationId/status', verifyToken, applicationController.updateAp
 router.get('/student-applications/:studentId', verifyToken, applicationController.getStudentApplications);
 
 // Route to get student's applications for university
-router.get('/university-applications/:universityId', verifyToken, applicationController.getUniversityApplications);
+router.get('/university-applications/:universityId', applicationController.getUniversityApplications);
 
 router.get('/:universityId/totalData', applicationController.getTotalUniversityData);
 

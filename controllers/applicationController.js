@@ -140,43 +140,72 @@ const getUniversityApplications = async (req, res) => {
         const { universityId } = req.params;
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
-        const search = req.query.search || '';
         const sortBy = req.query.sortBy || '';
 
         const skip = (page - 1) * limit;
 
-        const searchCondition = search
-            ? { university: universityId, 'student.profile.name': { $regex: search, $options: 'i' } }
-            : { university: universityId };
-
-        let sortOptions = { createdAt: -1 };
-
+        let sortField;
         if (sortBy === 'jeePr') {
-            sortOptions = { 'student.profile.academicBackground.jeePr': -1 };
+            sortField = 'student.profile.academicBackground.jeePr';
         } else if (sortBy === 'boardPr') {
-            sortOptions = { 'student.profile.academicBackground.boardPr': -1 };
+            sortField = 'student.profile.academicBackground.boardPr';
+        } else {
+            sortField = 'createdAt';
         }
 
-        const applications = await Application.find(searchCondition)
-            .populate('student')
-            .populate('course')
-            .sort(sortOptions)
-            .skip(skip)
-            .limit(limit);
+        const applications = await Application.aggregate([
+            {
+                $lookup:
+                /**
+                 * from: The target collection.
+                 * localField: The local join field.
+                 * foreignField: The target join field.
+                 * as: The name for the results.
+                 * pipeline: Optional pipeline to run on the foreign collection.
+                 * let: Optional variables to use in the pipeline field stages.
+                 */
+                {
+                    from: "students",
+                    localField: "student",
+                    foreignField: "_id",
+                    as: "student"
+                }
+            },
+            {
+                $unwind:
+                /**
+                 * path: Path to the array field.
+                 * includeArrayIndex: Optional name for index.
+                 * preserveNullAndEmptyArrays: Optional
+                 *   toggle to unwind null and empty values.
+                 */
+                {
+                    path: "$student"
+                }
+            },
+            {
 
-        const total = await Application.countDocuments(searchCondition);
+                /**
+                 * Provide any number of field/order pairs.
+                 */
+                $sort: { [sortField]: -1 }
+            }
+        ]).skip(skip).limit(limit);
+        const total = await Application.countDocuments();
         const totalPages = Math.ceil(total / limit);
 
         res.status(200).json({
             applications,
             page,
             totalPages,
-            total
+            total,
         });
     } catch (error) {
+        console.error('Error fetching university applications:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
 
 const getTotalUniversityData = async (req, res) => {
     try {
