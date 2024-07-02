@@ -154,8 +154,7 @@ const getUniversityApplications = async (req, res) => {
 
         const applications = await Application.aggregate([
             {
-                $lookup:
-                {
+                $lookup: {
                     from: "students",
                     localField: "student",
                     foreignField: "_id",
@@ -163,16 +162,35 @@ const getUniversityApplications = async (req, res) => {
                 }
             },
             {
-                $unwind:
-                {
+                $unwind: {
                     path: "$student"
                 }
             },
             {
+                $lookup: {
+                    from: "courses",
+                    localField: "course",
+                    foreignField: "_id",
+                    as: "course"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$course"
+                }
+            },
+            {
                 $sort: { [sortField]: -1 }
+            },
+            {
+                $skip: skip
+            },
+            {
+                $limit: limit
             }
-        ]).skip(skip).limit(limit);
-        const total = await Application.countDocuments();
+        ]);
+
+        const total = await Application.countDocuments() - 1;
         const totalPages = Math.ceil(total / limit);
 
         res.status(200).json({
