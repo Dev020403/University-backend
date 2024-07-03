@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const generateToken = (userId, username) => {
     return jwt.sign(
         { userId, username },
-        'your_secret_key_here',
+        process.env.JWT_SECRET,
         { expiresIn: '1h' }
     );
 };
@@ -16,7 +16,7 @@ const verifyToken = async (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token, 'your_secret_key_here');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         if (decoded) {
             req.user = decoded;

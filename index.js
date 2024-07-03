@@ -1,16 +1,17 @@
 const express = require('express');
 const cors = require("cors");
-
-const connectDb = require('./Config/connectDB');
+const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const routes = require('./router/routes');
 const universityRoutes = require('./router/univesityRoute');
 const courseRoutes = require('./router/courseRoute');
 const applicationRoutes = require('./router/applicationRoute');
+const connectDb = require('./Config/connectDb');
 
 const studentRoutes = require('./router/studentRoute');
 
 
+dotenv.config();
 const app = express();
 const port = 3000;
 
