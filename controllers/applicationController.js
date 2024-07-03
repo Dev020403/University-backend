@@ -138,6 +138,7 @@ const getStudentApplications = async (req, res) => {
 
 const getUniversityApplications = async (req, res) => {
     try {
+        const { universityId } = req.params;
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const sortBy = req.query.sortBy || '';
@@ -145,7 +146,7 @@ const getUniversityApplications = async (req, res) => {
 
         const skip = (page - 1) * limit;
 
-        let searchCriteria = {};
+        let searchCriteria = { university: new mongoose.Types.ObjectId(universityId) };
         if (searchQuery) {
             let objectId;
             try {
@@ -155,10 +156,15 @@ const getUniversityApplications = async (req, res) => {
             }
 
             searchCriteria = {
-                $or: [
-                    { "student.profile.name": { $regex: searchQuery, $options: 'i' } },
-                    { "student.email": { $regex: searchQuery, $options: 'i' } },
-                    { _id: objectId }
+                $and: [
+                    { university: new mongoose.Types.ObjectId(universityId) },
+                    {
+                        $or: [
+                            { "student.profile.name": { $regex: searchQuery, $options: 'i' } },
+                            { "student.email": { $regex: searchQuery, $options: 'i' } },
+                            { _id: objectId }
+                        ]
+                    }
                 ]
             };
         }
@@ -216,7 +222,7 @@ const getUniversityApplications = async (req, res) => {
         ]);
 
         const total = await Application.countDocuments(searchCriteria);
-        const totalPages = Math.ceil(total / limit);
+        const totalPages = Math.ceil(total / limit) - 1;
 
         res.status(200).json({
             applications,
