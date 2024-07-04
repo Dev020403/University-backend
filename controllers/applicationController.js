@@ -222,7 +222,7 @@ const getUniversityApplications = async (req, res) => {
         ]);
 
         const total = await Application.countDocuments(searchCriteria);
-        const totalPages = Math.ceil(total / limit) - 1;
+        const totalPages = Math.ceil(total / limit) ;
 
         res.status(200).json({
             applications,
