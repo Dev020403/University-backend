@@ -11,6 +11,6 @@ router.get('/students', verifyToken, studentController.getAllStudents);
 router.get('/students/:id', verifyToken, studentController.getStudentById);
 
 // Update student details
-router.put('/update-student/:_id', studentController.updateStudentDetails);
+router.put('/update-student/:_id', verifyToken, studentController.updateStudentDetails);
 
 module.exports = router;

@@ -8,10 +8,10 @@ router.post('/create-course', verifyToken,courseController.createCourse);
 
 router.get('/course/:id',verifyToken,courseController.getCourseById);
 
-router.get('/:universityId/courses',courseController.getCoursesByUniversity);
+router.get('/:universityId/courses',verifyToken,courseController.getCoursesByUniversity);
 
-router.delete('/delete-courses/:id', courseController.deleteCourse);
+router.delete('/delete-courses/:id', verifyToken,courseController.deleteCourse);
 
-router.put('/update-courses/:id', courseController.updateCourse);
+router.put('/update-courses/:id', verifyToken,courseController.updateCourse);
 
 module.exports = router;
