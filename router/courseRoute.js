@@ -1,17 +1,17 @@
 // courseRoutes.js
 const express = require('express');
 const router = express.Router();
-const { verifyToken } = require('../middleware/middlewares');
+const { verifyToken, authorizeRole } = require('../middleware/middlewares');
 const courseController = require('../controllers/courseController');
 
-router.post('/create-course', verifyToken,courseController.createCourse);
+router.post('/create-course', verifyToken, authorizeRole(['university', 'admin']), courseController.createCourse);
 
-router.get('/course/:id',verifyToken,courseController.getCourseById);
+router.get('/course/:id', verifyToken, authorizeRole(['student', 'university', 'admin']), courseController.getCourseById);
 
-router.get('/:universityId/courses',verifyToken,courseController.getCoursesByUniversity);
+router.get('/:universityId/courses', verifyToken, authorizeRole(['student', 'university', 'admin']), courseController.getCoursesByUniversity);
 
-router.delete('/delete-courses/:id', verifyToken,courseController.deleteCourse);
+router.delete('/delete-courses/:id', verifyToken, authorizeRole(['university', 'admin']), courseController.deleteCourse);
 
-router.put('/update-courses/:id', verifyToken,courseController.updateCourse);
+router.put('/update-courses/:id', verifyToken, authorizeRole(['university', 'admin']), courseController.updateCourse);
 
 module.exports = router;

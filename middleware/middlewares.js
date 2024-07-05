@@ -30,7 +30,23 @@ const verifyToken = async (req, res, next) => {
     }
 };
 
+const authorizeRole = (roles) => {
+    return (req, res, next) => {
+        const role = req.headers.role;
+
+        if (!roles.includes(role)) {
+            return res.status(403).json({ message: 'Forbidden: You do not have permission to access this resource' });
+        }
+
+        next();
+    };
+};
+
+module.exports = authorizeRole;
+
+
 module.exports = {
     generateToken,
-    verifyToken
+    verifyToken,
+    authorizeRole
 };

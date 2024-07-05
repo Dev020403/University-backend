@@ -23,6 +23,7 @@ const studentSchema = new Schema({
         date: { type: Date, default: Date.now },
         isRead: { type: Boolean, default: false }
     }],
+    role: { type: String, enum: ['student'], default: 'student' },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
 }, { timestamps: true });
 

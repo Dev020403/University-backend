@@ -2,15 +2,15 @@
 const express = require('express');
 const router = express.Router();
 const universityController = require('../controllers/universityController');
-const { verifyToken } = require('../middleware/middlewares');
+const { verifyToken, authorizeRole } = require('../middleware/middlewares');
 
-// GET all universities
+// GET all universities : done
 router.get('/universities', universityController.getAllUniversity);
 
-// GET a university by ID
-router.get('/universities/:id', verifyToken, universityController.getUniversityById);
+// GET a university by ID :done
+router.get('/universities/:id', verifyToken, authorizeRole(['student', 'university', 'admin']), universityController.getUniversityById);
 
-// PUT update a university by ID
-router.put('/update-university/:id', verifyToken, universityController.updateUniversityDetails);
+// PUT update a university by ID : done
+router.put('/update-university/:id', verifyToken, authorizeRole(['university', 'admin']), universityController.updateUniversityDetails);
 
 module.exports = router;

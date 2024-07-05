@@ -66,7 +66,6 @@ const registerStudent = async (req, res) => {
         res.status(500).json({ message: 'Failed to register student' });
     }
 };
-
 const login = async (req, res) => {
     const { username, password } = req.body;
 
@@ -86,7 +85,7 @@ const login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid password' });
         }
 
-        const token = generateToken(user._id, user.username);
+        const token = generateToken(user._id, user.username, role);
 
         res.status(200).json({ token, role, user });
     } catch (error) {

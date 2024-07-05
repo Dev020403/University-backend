@@ -2,15 +2,15 @@
 const express = require('express');
 const router = express.Router();
 const studentController = require('../controllers/studentController');
-const { verifyToken } = require('../middleware/middlewares');
+const { verifyToken, authorizeRole } = require('../middleware/middlewares');
 
-// GET all universities
-router.get('/students', verifyToken, studentController.getAllStudents);
+// GET all students
+router.get('/students', verifyToken, authorizeRole(['university', 'admin']), studentController.getAllStudents);
 
-// GET a university by ID
-router.get('/students/:id', verifyToken, studentController.getStudentById);
+// GET a student by ID
+router.get('/students/:id', verifyToken, authorizeRole(['university', 'admin', 'student']), studentController.getStudentById);
 
 // Update student details
-router.put('/update-student/:_id', verifyToken, studentController.updateStudentDetails);
+router.put('/update-student/:_id', verifyToken, authorizeRole(['student', 'admin']), studentController.updateStudentDetails);
 
 module.exports = router;

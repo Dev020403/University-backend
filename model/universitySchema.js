@@ -24,6 +24,8 @@ const universitySchema = new Schema({
         phone: String,
         website: String,
     },
+    role: { type: String, enum: ['university'], default: 'university' },
+    status: { type: String, enum: ['active', 'inactive'], default: 'active' },
 }, { timestamps: true });
 
 module.exports = mongoose.model('University', universitySchema);
