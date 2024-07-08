@@ -85,6 +85,11 @@ const login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid password' });
         }
 
+        // Check if user status is active
+        if (user.status !== 'active') {
+            return res.status(403).json({ message: 'User is not active. Please contact admin.' });
+        }
+
         const token = generateToken(user._id, user.username, role);
 
         res.status(200).json({ token, role, user });
@@ -93,6 +98,7 @@ const login = async (req, res) => {
         res.status(500).json({ message: 'Failed to log in' });
     }
 };
+
 
 module.exports = {
     registerUniversity,

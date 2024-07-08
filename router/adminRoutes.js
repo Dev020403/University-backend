@@ -10,4 +10,6 @@ router.put('/student-status/:studentId', adminController.updateStudentStatus);
 
 router.put('/university-status/:universityId', adminController.updateUniversityStatus);
 
+router.get('/stats', adminController.countStats);
+
 module.exports = router;

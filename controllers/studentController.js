@@ -1,6 +1,5 @@
 const Student = require('../model/studentSchema');
 const Application = require('../model/applicationSchema');
-// Get all students
 exports.getAllStudents = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -10,7 +9,13 @@ exports.getAllStudents = async (req, res) => {
 
         // Create a search condition
         const searchCondition = search
-            ? { name: { $regex: search, $options: 'i' } }
+            ? {
+                $or: [
+                    { 'profile.name': { $regex: search, $options: 'i' } },
+                    { email: { $regex: search, $options: 'i' } },
+                    { 'profile.personalInfo.phone': { $regex: search, $options: 'i' } },
+                ],
+            }
             : {};
 
         const students = await Student.find(searchCondition)
@@ -24,13 +29,12 @@ exports.getAllStudents = async (req, res) => {
             students,
             page,
             totalPages,
-            total
+            total,
         });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching students', error });
     }
 };
-
 
 
 // Get student by ID

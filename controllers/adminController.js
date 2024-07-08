@@ -101,9 +101,28 @@ const loginAdmin = async (req, res) => {
     }
 };
 
+const countStats = async (req, res) => {
+    try {
+        const totalStudents = await Student.countDocuments({});
+        const totalUniversities = await University.countDocuments({});
+        const activeStudents = await Student.countDocuments({ status: 'active' });
+        const activeUniversities = await University.countDocuments({ status: 'active' });
+
+        res.status(200).json({
+            totalStudents,
+            totalUniversities,
+            activeStudents,
+            activeUniversities
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching statistics', error });
+    }
+};
+
 module.exports = {
     updateStudentStatus,
     updateUniversityStatus,
     signupAdmin,
     loginAdmin,
+    countStats
 };

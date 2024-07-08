@@ -11,7 +11,12 @@ const getAllUniversity = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const searchCondition = search
-            ? { name: { $regex: search, $options: 'i' } }
+            ? {
+                $or: [
+                    { name: { $regex: search, $options: 'i' } },
+                    { email: { $regex: search, $options: 'i' } },
+                ]
+            }
             : {};
 
         const universities = await University.find(searchCondition)
