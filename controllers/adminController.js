@@ -1,8 +1,7 @@
-const Student = require('../models/studentModel');
-const University = require('../models/universityModel');
-const Admin = require('../models/adminModel');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const Student = require('../model/studentSchema');
+const University = require('../model/universitySchema');
+const Admin = require('../model/adminSchema');
 const { generateToken } = require('../middleware/middlewares');
 
 const updateStudentStatus = async (req, res) => {
@@ -63,7 +62,8 @@ const signupAdmin = async (req, res) => {
         if (admin) {
             return res.status(400).json({ error: 'Admin already exists' });
         }
-        admin = new Admin({ username, password });
+        const hashedPassword = await bcrypt.hash(password, 10);
+        admin = new Admin({ username, password: hashedPassword });
         await admin.save();
 
         res.status(201).json({ message: 'Admin registered successfully' });
@@ -77,20 +77,25 @@ const loginAdmin = async (req, res) => {
 
     try {
         const admin = await Admin.findOne({ username });
+
         if (!admin) {
             return res.status(400).json({ error: 'Invalid credentials' });
         }
+        console.log(admin)
 
+        console.log(password, admin.password, typeof (password), typeof (admin.password))
         const isMatch = await bcrypt.compare(password, admin.password);
+
         if (!isMatch) {
             return res.status(400).json({ error: 'Invalid credentials' });
         }
-
         if (admin.status !== 'active') {
             return res.status(403).json({ error: 'Account is inactive' });
         }
-        token = generateToken(admin._id, admin.username, 'admin')
-        res.status(200).json({ message: 'Login successful', token });
+        const token = generateToken(admin._id, admin.username, 'admin');
+
+        res.status(200).json({ user: admin, token, role: 'admin' });
+
     } catch (error) {
         res.status(500).json({ error: 'Internal server error', details: error.message });
     }

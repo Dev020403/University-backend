@@ -6,6 +6,7 @@ const routes = require('./router/routes');
 const universityRoutes = require('./router/univesityRoute');
 const courseRoutes = require('./router/courseRoute');
 const applicationRoutes = require('./router/applicationRoute');
+const adminRoutes = require('./router/adminRoutes');
 const connectDb = require('./Config/connectDb');
 
 const studentRoutes = require('./router/studentRoute');
@@ -27,6 +28,7 @@ app.use('/api', universityRoutes);
 app.use('/api', courseRoutes);
 app.use('/api', applicationRoutes);
 app.use('/api', studentRoutes);
+app.use('/admin',adminRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
