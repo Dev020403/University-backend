@@ -109,9 +109,30 @@ const updateUniversityDetails = async (req, res) => {
         res.status(500).send('Server Error');
     }
 };
+const deleteUniversity = async (req, res) => {
+    const { id } = req.params;
 
+    try {
+        const university = await University.findById(id);
+
+        if (!university) {
+            return res.status(404).json({ message: 'University not found' });
+        }
+
+        await Course.deleteMany({ university: university._id });
+
+        await Application.deleteMany({ university: university._id });
+
+        // Delete the university
+        await university.deleteOne();
+        res.status(200).json({ message: 'University deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
 module.exports = {
     getAllUniversity,
     getUniversityById,
-    updateUniversityDetails
+    updateUniversityDetails,
+    deleteUniversity
 };

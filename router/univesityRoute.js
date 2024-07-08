@@ -13,4 +13,7 @@ router.get('/universities/:id', verifyToken, authorizeRole(['student', 'universi
 // PUT update a university by ID : done
 router.put('/update-university/:id', verifyToken, authorizeRole(['university', 'admin']), universityController.updateUniversityDetails);
 
+// DELETE university
+router.delete('/delete-university/:id', verifyToken, authorizeRole(['admin']), universityController.deleteUniversity);
+
 module.exports = router;
