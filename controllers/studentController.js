@@ -1,5 +1,5 @@
 const Student = require('../model/studentSchema');
-
+const Application = require('../model/applicationSchema');
 // Get all students
 exports.getAllStudents = async (req, res) => {
     try {
@@ -89,3 +89,23 @@ exports.updateStudentDetails = async (req, res) => {
         res.status(500).send('Server Error');
     }
 }
+
+exports.deleteStudent = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const student = await Student.findById(id);
+        if (!student) {
+            return res.status(404).json({ message: 'Student not found' });
+        }
+
+        await Application.deleteMany({ student: student._id });
+
+        await student.deleteOne();
+
+        res.json({ message: 'Student and associated applications deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting student and associated applications:', error);
+        res.status(500).json({ message: 'Error deleting student and associated applications', error });
+    }
+};

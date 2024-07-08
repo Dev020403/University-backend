@@ -13,4 +13,7 @@ router.get('/students/:id', verifyToken, authorizeRole(['university', 'admin', '
 // Update student details
 router.put('/update-student/:_id', verifyToken, authorizeRole(['student', 'admin']), studentController.updateStudentDetails);
 
+// Delete a student
+router.delete('/delete-student/:id', verifyToken, authorizeRole(['admin']), studentController.deleteStudent);
+
 module.exports = router;
