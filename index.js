@@ -7,9 +7,12 @@ const universityRoutes = require('./router/univesityRoute');
 const courseRoutes = require('./router/courseRoute');
 const applicationRoutes = require('./router/applicationRoute');
 const adminRoutes = require('./router/adminRoutes');
+const roleAndPermissionRoutes = require('./router/roleAndPermissionRoute');
+const studentRoutes = require('./router/studentRoute');
+const adminUserRoute = require('./router/adminUserRoute');
+
 const connectDb = require('./Config/connectDb');
 
-const studentRoutes = require('./router/studentRoute');
 
 
 dotenv.config();
@@ -28,7 +31,10 @@ app.use('/api', universityRoutes);
 app.use('/api', courseRoutes);
 app.use('/api', applicationRoutes);
 app.use('/api', studentRoutes);
-app.use('/admin',adminRoutes);
+app.use('/api', roleAndPermissionRoutes);
+app.use('/admin', adminRoutes);
+
+app.use('/role', adminUserRoute);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

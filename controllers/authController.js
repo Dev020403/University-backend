@@ -56,7 +56,8 @@ const registerStudent = async (req, res) => {
             email,
             password: hashedPassword,
             profile,
-            status
+            status,
+            role: 'student'
         });
         await newStudent.save();
 
