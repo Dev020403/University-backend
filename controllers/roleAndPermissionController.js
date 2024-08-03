@@ -5,10 +5,10 @@ const Permission = require('../model/permissionSchema');
 const permissionController = {
     create: async (req, res) => {
         try {
-            const { name, description } = req.body;
-            const permission = new Permission({ name, description });
-            await permission.save();
-            res.status(201).json(permission);
+            const { module, permission } = req.body;
+            const per = new Permission({ module, permission });
+            await per.save();
+            res.status(201).json(per);
         } catch (error) {
             res.status(400).json({ message: error.message });
         }
@@ -34,6 +34,16 @@ const roleController = {
             res.status(201).json(role);
         } catch (error) {
             res.status(400).json({ message: error.message });
+        }
+    },
+    getRoles: async (req, res) => {
+        try {
+            const roles = await Role.find().populate('permissions');
+            res.status(200).json(roles);
+        } catch (error) {
+            res.status(500).json({
+                message: 'Server error', error
+            })
         }
     },
 
@@ -76,6 +86,17 @@ const roleController = {
                 return res.status(404).json({ message: 'Role not found' });
             }
             res.status(200).json(role);
+        } catch (error) {
+            res.status(500).json({ message: 'Server error', error });
+        }
+    },
+    deleteRole: async (req, res) => {
+        try {
+            const role = await Role.findByIdAndDelete(req.params.roleId);
+            if (!role) {
+                return res.status(404).json({ message: 'Role not found' });
+            }
+            res.status(200).json({ message: 'Role deleted successfully' });
         } catch (error) {
             res.status(500).json({ message: 'Server error', error });
         }

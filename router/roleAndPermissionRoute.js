@@ -8,8 +8,10 @@ router.get('/all-permissions', permissionController.getAll); // Get all permissi
 
 // Role routes
 router.post('/create-role', roleController.create); // Create a new role
+router.get('/all-roles', roleController.getRoles); // Get all roles
 router.get('/role-with-permission/:roleId', roleController.getRoleWithPermissions); // Get a role with its permissions
 router.put('/update-role-permissions/:roleId/permissions', roleController.updatePermissions); // Update role permissions
 router.post('/roles/add-permission', roleController.addPermission); // Add a permission to a role
+router.delete('/delete-role/:roleId', roleController.deleteRole); // Delete a role
 
 module.exports = router;
